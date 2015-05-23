@@ -279,7 +279,7 @@ void Rectify21(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 	}
 
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-	std::vector< DMatch > good_matches, gm;
+	std::vector< DMatch > good_matches;
 
 	for (int i = 0; i < descriptors_object.rows; i++)
 	{
@@ -315,15 +315,7 @@ void Rectify21(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 		MapCoordToAngle(scene[i].x, scene[i].y, g_f, tphi3, ttheta3, 0);
 		dphi[i] = tphi3 - tphi4;
 		dtheta[i] = ttheta3 - ttheta4;
-		if (abs(dphi[i]) > 0.17 || abs(dtheta[i]) > 0.25)
-			hashmap[i] = 0;
-		else
-			gm.push_back(good_matches[i]);
 	}
-	drawMatches(res2_part, keypoints_object, res3_part, keypoints_scene,
-		gm, img_matches, Scalar::all(-1), Scalar::all(-1),
-		vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-	imwrite("matches21_1.png", img_matches);
 
 	while (true) {
 		double aphi = 0, atheta = 0;
@@ -389,7 +381,7 @@ void Rectify41(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 	extractor.compute(res3_part, keypoints_scene, descriptors_scene);
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
-	FlannBasedMatcher matcher;
+	BFMatcher matcher;
 	std::vector< DMatch > matches;
 	matches.reserve(10000);
 	matcher.match(descriptors_object, descriptors_scene, matches);
@@ -440,8 +432,6 @@ void Rectify41(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 		MapCoordToAngle(scene[i].x, scene[i].y, g_f, tphi3, ttheta3, 0);
 		dphi[i] = tphi3 - tphi4;
 		dtheta[i] = ttheta3 - ttheta4;
-		if (abs(dphi[i]) > 0.03 || abs(dtheta[i]) > 0.005)
-			hashmap[i] = 0;
 	}
 	while (true) {
 		double aphi = 0, atheta = 0;
@@ -507,7 +497,7 @@ void Rectify23(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 	extractor.compute(res3_part, keypoints_scene, descriptors_scene);
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
-	FlannBasedMatcher matcher;
+	BFMatcher matcher;
 	std::vector< DMatch > matches;
 	matches.reserve(10000);
 	matcher.match(descriptors_object, descriptors_scene, matches);
@@ -558,10 +548,6 @@ void Rectify23(Mat& res2, Mat& res3, double& offset_phi, double& offset_theta) {
 		MapCoordToAngle(scene[i].x, scene[i].y, g_f, tphi3, ttheta3, 2);
 		dphi[i] = tphi3 - tphi4;
 		dtheta[i] = ttheta3 - ttheta4;
-		if (abs(dphi[i]) > 0.005 || abs(dtheta[i]) > 0.03)
-			hashmap[i] = 0;
-		else
-			gm.push_back(good_matches[i]);
 	}
 	drawMatches(res2_part, keypoints_object, res3_part, keypoints_scene,
 		gm, img_matches, Scalar::all(-1), Scalar::all(-1),
@@ -631,7 +617,7 @@ void Rectify43(Mat& res4, Mat& res3, double& offset_phi, double& offset_theta) {
 	extractor.compute(res3_part, keypoints_scene, descriptors_scene);
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
-	FlannBasedMatcher matcher;
+	BFMatcher matcher;
 	std::vector< DMatch > matches;
 	matches.reserve(10000);
 	matcher.match(descriptors_object, descriptors_scene, matches);
@@ -683,8 +669,6 @@ void Rectify43(Mat& res4, Mat& res3, double& offset_phi, double& offset_theta) {
 		MapCoordToAngle(scene[i].x, scene[i].y, g_f, tphi3, ttheta3, 2);
 		dphi[i] = tphi3 - tphi4;
 		dtheta[i] = ttheta3 - ttheta4;
-		if (abs(dphi[i]) > 0.03 || abs(dtheta[i]) > 0.005)
-			hashmap[i] = 0;
 	}
 	while (true) {
 		double aphi = 0, atheta = 0;
